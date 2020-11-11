@@ -16,3 +16,5 @@ config <- make_config(list(mean_si=6, std_mean_si=1,
 roft <- estimate_R(t, method="uncertain_si", config=config)
 
 plot(roft, legend=FALSE)
+
+write.csv(roft$R, "repro_num.csv", row.names=FALSE)

@@ -7,7 +7,6 @@ import json
 from functools import reduce
 import pandas as pd
 from sodapy import Socrata
-import matplotlib.pyplot as plt
 
 # Virginia is professional
 
@@ -35,7 +34,7 @@ today = date.today()
 month = today.strftime("%B-")
 dayofmonth = today.strftime("%d")
 dayofmonth = dayofmonth.lstrip("0")
-dayofmonth = '8'
+dayofmonth = '10'
 year = today.strftime("-%Y")
 today_str = month + dayofmonth + year
 
@@ -88,11 +87,5 @@ df["dmv_total_cases"] = df.sum(axis=1)
 
 df["dmv_new_cases"] = df["dmv_total_cases"].diff(1)
 df.index.name = "report_date"
-
-fig = plt.figure()
-ax = fig.add_subplot(1, 1, 1)
-ax.plot(df.index, df["dmv_new_cases"])
-
-plt.show()
 
 df.to_csv("daily_incidence.csv")

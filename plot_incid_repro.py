@@ -59,13 +59,13 @@ for i, day in enumerate(sorted(important_dates.keys())):
 lim_transform = ax2.transData + ax2.transAxes.inverted()
 
 ax2.axvspan(last_repro, incid["report_date"].loc[repro.index].max(),
-            facecolor="gold", label="likely to change", alpha=0.5)
+            facecolor="gold", label="Likely to change", alpha=0.5)
 ax2.axhspan(1, 1.5, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             facecolor="darkturquoise", alpha=0.5,
-            label="increase in average number of cases\nover following 7 days")
+            label="Epidemic won't end")
 ax2.axhspan(0.5, 1, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             facecolor="navajowhite", alpha=0.5,
-            label="decrease in average number of cases\nover following 7 days")
+            label="Epidemic will eventually end")
 
 handles, labels = ax2.get_legend_handles_labels()
 handles = [handles[-3]] + handles[-2:] + handles[:-3]

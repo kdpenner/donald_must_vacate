@@ -62,7 +62,7 @@ ax2.axvspan(last_repro, incid["report_date"].loc[repro.index].max(),
             facecolor="gold", label="Likely to change", alpha=0.5)
 ax2.axhspan(1, 1.5, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             facecolor="darkturquoise", alpha=0.5,
-            label="Epidemic won't end")
+            label="Epidemic won't end if sustained")
 ax2.axhspan(0.5, 1, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             facecolor="navajowhite", alpha=0.5,
             label="Epidemic will eventually end if sustained")

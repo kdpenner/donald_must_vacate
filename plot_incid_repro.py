@@ -65,7 +65,7 @@ ax2.axhspan(1, 1.5, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             label="Epidemic won't end\nif sustained")
 ax2.axhspan(0.5, 1, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             facecolor="navajowhite", alpha=0.5,
-            label="Epidemic will eventually\nend if sustained")
+            label="Epidemic will eventually end\nif sustained")
 
 handles, labels = ax2.get_legend_handles_labels()
 handles = [handles[-3]] + handles[-2:] + handles[:-3]

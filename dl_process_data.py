@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date
+from datetime import date, timedelta
 import requests
 import io
 import json
@@ -34,24 +34,32 @@ today = date.today()
 month = today.strftime("%B-")
 dayofmonth = today.strftime("%d")
 dayofmonth = dayofmonth.lstrip("0")
-dayofmonth = '10'
 year = today.strftime("-%Y")
 today_str = month + dayofmonth + year
 
 base_url_dc = (r"https://coronavirus.dc.gov/sites/default/files/dc/sites/"
                "coronavirus/page_content/attachments/")
-fname_dc = "DC-COVID-19-Updated-Data-for-" + today_str + ".xlsx"
+fname_dc = "DC-COVID-19-Data-for-" + today_str + ".xlsx"
 
 full_url_dc = base_url_dc + fname_dc
 
 req_dc = requests.get(full_url_dc)
+offset_day = timedelta(days=1)
 
-if req_dc.status_code == 200:
-    df_dc_excel = pd.read_excel(io.BytesIO(req_dc.content))
-else:
-    print("DC file probably not found, try later")
-    sys.exit(1)
+while req_dc.status_code != 200:
+    earlier = today - offset_day
+    month = earlier.strftime("%B-")
+    dayofmonth = earlier.strftime("%d")
+    dayofmonth = dayofmonth.lstrip("0")
+    year = earlier.strftime("-%Y")
+    earlier_str = month + dayofmonth + year
+    fname_dc = "DC-COVID-19-Data-for-" + earlier_str + ".xlsx"
+    full_url_dc = base_url_dc + fname_dc
+    req_dc = requests.get(full_url_dc)
+    offset_day += offset_day
 
+print("File: "+fname_dc)
+df_dc_excel = pd.read_excel(io.BytesIO(req_dc.content))
 df_dc = df_dc_excel.iloc[3, 2:].T
 df_dc.dropna(inplace=True)
 df_dc.index = pd.to_datetime(df_dc.index)

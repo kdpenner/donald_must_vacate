@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, datestr2num, MonthLocator, DateFormatter
-from datetime import timedelta
+from datetime import date, timedelta
 
 incid = pd.read_csv("daily_incidence.csv")
 incid["report_date"] = pd.to_datetime(incid["report_date"])
@@ -83,6 +83,7 @@ ax2.xaxis.set_major_formatter(formatter)
 
 fig.autofmt_xdate()
 
-plt.savefig("dmv_summary.png", bbox_inches="tight")
+plt.savefig("dmv_summary_{0}.png".format(date.today().strftime("%Y%m%d")),
+            bbox_inches="tight")
 
 plt.show()

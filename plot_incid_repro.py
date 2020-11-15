@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, datestr2num, MonthLocator, DateFormatter
 from datetime import date, timedelta
+import calc_prob
 
 incid = pd.read_csv("daily_incidence.csv")
 incid["report_date"] = pd.to_datetime(incid["report_date"])
@@ -29,16 +30,16 @@ last_incid = incid["report_date"].max() - delta_incid
 delta_repro = timedelta(days=17)
 last_repro = incid["report_date"].max() - delta_repro
 
-fig = plt.figure(figsize=(7, 10))
+fig = plt.figure(figsize=(7, 15))
 
-ax1 = fig.add_subplot(2, 1, 1)
+ax1 = fig.add_subplot(3, 1, 1)
 
-ax1.step(incid["report_date"], incid["dmv_new_cases"], where="post")
+ax1.step(incid["report_date"], incid["dmv_new_cases"], where="pre")
 ax1.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
             alpha=0.5)
 ax1.set_ylabel("Daily number of new positive cases")
 
-ax2 = fig.add_subplot(2, 1, 2, sharex=ax1)
+ax2 = fig.add_subplot(3, 1, 2, sharex=ax1)
 
 ax2.step(incid["report_date"].loc[repro.index], repro["Median(R)"],
          where="pre")
@@ -71,17 +72,28 @@ handles, labels = ax2.get_legend_handles_labels()
 handles = [handles[-3]] + handles[-2:] + handles[:-3]
 labels = [labels[-3]] + labels[-2:] + labels[:-3]
 
-ax2.legend(handles, labels, loc='lower left', bbox_to_anchor=(1, 0))
+ax2.legend(handles, labels, loc='lower left', bbox_to_anchor=(1, -0.4))
 
 ax2.set_ylim([0.5, 1.5])
 ax2.set_ylabel("Instantaneous reproduction number")
 
+probs = calc_prob.prob_gathering(incid)
+
+ax3 = fig.add_subplot(3, 1, 3, sharex=ax1)
+
+ax3.step(probs.iloc[10:].index, probs.iloc[10:]*100., where="pre")
+ax3.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
+            alpha=0.5)
+ax3.set_ylabel(("For a gathering of 10, probability (%)\n"
+                "that at least 1 person has virus"))
+
 locator = MonthLocator()
 formatter = DateFormatter("%B")
-ax2.xaxis.set_major_locator(locator)
-ax2.xaxis.set_major_formatter(formatter)
+ax3.xaxis.set_major_locator(locator)
+ax3.xaxis.set_major_formatter(formatter)
 
 fig.autofmt_xdate()
+fig.subplots_adjust(hspace=0)
 
 plt.savefig("dmv_summary_{0}.png".format(date.today().strftime("%Y%m%d")),
             bbox_inches="tight")

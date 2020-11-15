@@ -36,7 +36,7 @@ ax1 = fig.add_subplot(2, 1, 1)
 ax1.step(incid["report_date"], incid["dmv_new_cases"], where="post")
 ax1.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
             alpha=0.5)
-ax1.set_ylabel("Number of new positive cases")
+ax1.set_ylabel("Daily number of new positive cases")
 
 ax2 = fig.add_subplot(2, 1, 2, sharex=ax1)
 
@@ -62,10 +62,10 @@ ax2.axvspan(last_repro, incid["report_date"].loc[repro.index].max(),
             facecolor="gold", label="Likely to change", alpha=0.5)
 ax2.axhspan(1, 1.5, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             facecolor="darkturquoise", alpha=0.5,
-            label="Epidemic won't end\nif sustained")
+            label="Pandemic won't end\nif sustained")
 ax2.axhspan(0.5, 1, xmax=lim_transform.transform((date2num(last_repro), 0))[0],
             facecolor="navajowhite", alpha=0.5,
-            label="Epidemic will eventually end\nif sustained")
+            label="Pandemic will eventually end\nif sustained")
 
 handles, labels = ax2.get_legend_handles_labels()
 handles = [handles[-3]] + handles[-2:] + handles[:-3]

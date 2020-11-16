@@ -1,8 +1,13 @@
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, datestr2num, MonthLocator, DateFormatter
 from datetime import date, timedelta
 import calc_prob
+
+
+matplotlib.rc("font", **{"family": "sans-serif", "sans-serif": "Helvetica",
+                         "weight": "bold", "size": 16})
 
 incid = pd.read_csv("daily_incidence.csv")
 incid["report_date"] = pd.to_datetime(incid["report_date"])
@@ -37,7 +42,7 @@ ax1 = fig.add_subplot(3, 1, 1)
 ax1.step(incid["report_date"], incid["dmv_new_cases"], where="pre")
 ax1.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
             alpha=0.5)
-ax1.set_ylabel("Daily number of new positive cases")
+ax1.set_ylabel("Daily number of\nnew positive cases")
 
 ax2 = fig.add_subplot(3, 1, 2, sharex=ax1)
 
@@ -72,10 +77,10 @@ handles, labels = ax2.get_legend_handles_labels()
 handles = [handles[-3]] + handles[-2:] + handles[:-3]
 labels = [labels[-3]] + labels[-2:] + labels[:-3]
 
-ax2.legend(handles, labels, loc='lower left', bbox_to_anchor=(1, -0.4))
+ax2.legend(handles, labels, loc='lower left', bbox_to_anchor=(1, -0.5))
 
 ax2.set_ylim([0.5, 1.5])
-ax2.set_ylabel("Instantaneous reproduction number")
+ax2.set_ylabel("Reproduction number")
 
 probs = calc_prob.prob_gathering(incid)
 
@@ -84,8 +89,8 @@ ax3 = fig.add_subplot(3, 1, 3, sharex=ax1)
 ax3.step(probs.iloc[10:].index, probs.iloc[10:]*100., where="pre")
 ax3.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
             alpha=0.5)
-ax3.set_ylabel(("For a gathering of 10, probability (%)\n"
-                "that at least 1 person has virus"))
+ax3.set_ylabel(("For a gathering of 10,\nprobability (%) "
+                "that at least\n1 person has virus"))
 
 locator = MonthLocator()
 formatter = DateFormatter("%B")
@@ -93,9 +98,14 @@ ax3.xaxis.set_major_locator(locator)
 ax3.xaxis.set_major_formatter(formatter)
 
 fig.autofmt_xdate()
-fig.subplots_adjust(hspace=0)
+fig.subplots_adjust(hspace=0.05)
+fig.text(0, 0.08, (
+                "The Donald Must Vacate Project\n"
+                "Data: Virginia, D.C., and Maryland departments of health; "
+                "Census Bureau\n"
+                "Source code: https://github.com/kdpenner/donald_must_vacate"))
 
 plt.savefig("dmv_summary_{0}.png".format(date.today().strftime("%Y%m%d")),
-            bbox_inches="tight")
+            bbox_inches="tight", dpi=300)
 
-plt.show()
+plt.close()

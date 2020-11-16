@@ -55,6 +55,11 @@ William. Included MD counties: Montgomery and Prince George's.
 I use the [`EpiEstim`][3] package to estimate the instantaneous reproduction
 number as a function of time from the incidence time series.
 
+## Disclaimers
+
+This product uses the Census Bureau Data API but is not endorsed or certified
+by the Census Bureau.
+
 [1]: <https://academic.oup.com/aje/article/178/9/1505/89262>
 
 [2]: <https://www.cdc.gov/coronavirus/2019-ncov/hcp/planning-scenarios.html>

@@ -64,8 +64,8 @@ infected. The remainder may be. The probability shown in the bottom plot is the
 probability that at least 1 person in the random group of 10 is infected. If
 the probability is 100%, one or more people are infected---there is no doubt.
 If the probability is 0%, no person is infected---there is no doubt. If the
-probability is 0.2, you are more certain that one or more people are infected
-than if the probability is 0.1.
+probability is 20%, you are more certain that one or more people are infected
+than if the probability is 10%.
 
 Credit for this idea goes to [Chande et al. (2020)][3]. The model is very
 simple and should be taken with many grains of salt.

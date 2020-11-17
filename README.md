@@ -52,14 +52,18 @@ a few days. The number of contagious people is [11 times][2] the number of
 people who've tested positive. This number could be between 6 and 24.
 
 Let's assume that for every 1 person who tests positive and isolates for 10
-days, 10 others are free to infect the population. If you are at a gathering of
-10 random people, some of these people won't be infected; the remainder may be.
-The probability shown in the bottom plot is the probability that at least 1
-person in the random group of 10 is infected. When the probability is 1, at
-least 1 person is infected---there is no doubt. When the probability is 0, no
-person is infected---there is no doubt.
+days, 10 other people are contagious and free to infect the population. If
+1,000 people have tested positive in the past 10 days, 10,000 people are
+roaming free.
 
-Credit for this idea goes to [Chande et al. (2020)][3].
+If you go to a gathering of 10 random people, some of these people won't be
+infected; the remainder may be. The probability shown in the bottom plot is the
+probability that at least 1 person in the random group of 10 is infected. When
+the probability is 1, at least 1 person is infected---there is no doubt. When
+the probability is 0, no person is infected---there is no doubt.
+
+Credit for this idea goes to [Chande et al. (2020)][3]. The model is very
+simple and should be taken with many grains of salt.
 
 ## Data
 

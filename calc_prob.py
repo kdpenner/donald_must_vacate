@@ -7,7 +7,7 @@ def prob_gathering(incid):
 
     infectious_det = incid["dmv_new_cases"].rolling("10d").sum()
 
-    ascertainment_bias = 10.
+    ascertainment_bias = 11.
 
     infectious_asym = infectious_det * (ascertainment_bias - 1)
 

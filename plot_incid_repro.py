@@ -105,7 +105,14 @@ fig.text(0, 0.08, (
                 "Census Bureau\n"
                 "Source code: https://github.com/kdpenner/donald_must_vacate"))
 
-plt.savefig("dmv_summary_{0}.png".format(date.today().strftime("%Y%m%d")),
+today = date.today()
+
+fig.suptitle((
+             "Pandemic statistics for the D.C.-NoVA-southern MD "
+             "agglomeration, "+today.strftime("%Y-%m-%d")),
+             x=0.7, y=0.92)
+
+plt.savefig("dmv_summary_{0}.png".format(today.strftime("%Y%m%d")),
             bbox_inches="tight", dpi=300)
 
 plt.close()

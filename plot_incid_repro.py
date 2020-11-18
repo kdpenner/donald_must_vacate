@@ -23,7 +23,7 @@ important_dates = {
             "2020-06-19": "MoCo phase 2",
             "2020-06-15": "Prince George's phase 2",
             "2020-07-27": "John Lewis viewing",
-            "2020-09-23": "RGB viewing",
+            "2020-09-23": "RBG viewing",
             "2020-09-26": "ACB Rose Garden event",
             "2020-10-03": "Trump's positive test",
             "2020-05-25": "Memorial Day",

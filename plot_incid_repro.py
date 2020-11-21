@@ -108,7 +108,7 @@ fig.text(0, 0.08, (
 today = date.today()
 
 fig.suptitle((
-             "Pandemic statistics for the D.C.-NoVA-southern MD "
+             "Pandemic statistics for the\nD.C. + NoVA + MoCo + PG's county "
              "agglomeration, "+today.strftime("%Y-%m-%d")),
              x=0.7, y=0.92)
 

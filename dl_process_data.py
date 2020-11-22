@@ -94,7 +94,14 @@ df = reduce(lambda left, right: pd.merge(left=left, right=right, how="inner",
 df["dmv_total_cases"] = df.sum(axis=1)
 
 df["dmv_new_cases"] = df["dmv_total_cases"].diff(1)
+df["va_new_cases"] = df["va_total_cases"].diff(1)
+df["dc_new_cases"] = df["dc_total_cases"].diff(1)
+df["md_new_cases"] = df["md_total_cases"].diff(1)
+
 df.loc[df.index[0], "dmv_new_cases"] = df.loc[df.index[0], "dmv_total_cases"]
+df.loc[df.index[0], "va_new_cases"] = df.loc[df.index[0], "va_total_cases"]
+df.loc[df.index[0], "dc_new_cases"] = df.loc[df.index[0], "dc_total_cases"]
+df.loc[df.index[0], "md_new_cases"] = df.loc[df.index[0], "md_total_cases"]
 df.index.name = "report_date"
 
 df.to_csv("daily_incidence.csv")

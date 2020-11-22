@@ -30,7 +30,7 @@ important_dates = {
             "2020-07-04": "Independence Day",
             "2020-09-07": "Labor Day"}
 
-delta_incid = timedelta(days=10)
+delta_incid = timedelta(days=7)
 last_incid = incid["report_date"].max() - delta_incid
 delta_repro = timedelta(days=17)
 last_repro = incid["report_date"].max() - delta_repro
@@ -86,10 +86,10 @@ probs = calc_prob.prob_gathering(incid)
 
 ax3 = fig.add_subplot(3, 1, 3, sharex=ax1)
 
-ax3.step(probs.iloc[10:].index, probs.iloc[10:]*100., where="pre")
+ax3.step(probs.iloc[10:].index, probs.iloc[10:], where="pre")
 ax3.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
             alpha=0.5)
-ax3.set_ylabel(("For a gathering of 10,\nprobability (%) "
+ax3.set_ylabel(("For a gathering of 10,\nprobability "
                 "that at least\n1 person has virus"))
 
 locator = MonthLocator()
@@ -113,6 +113,6 @@ fig.suptitle((
              x=0.7, y=0.92)
 
 plt.savefig("dmv_summary_{0}.png".format(today.strftime("%Y%m%d")),
-            bbox_inches="tight", dpi=300)
+            bbox_inches="tight")
 
 plt.close()

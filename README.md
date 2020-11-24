@@ -52,8 +52,8 @@ uncertain to a few days.
 
 The number of contagious people is estimated to be [11 times][2] the number of
 people who've tested positive. The true multiplicative factor, with plausible
-values between 6 and 24, may be a function of region. State-by-state
-[seroprevalence studies][5] may be [unreliable][6].
+values between 6 and 24, may be a function of region. [State-by-state
+estimates][5] may be [low][6].
 
 Let's assume that for every 1 person who tests positive and isolates for 10
 days, 10 other people are contagious and free to infect the population. If
@@ -85,7 +85,7 @@ William. Included MD counties: Montgomery and Prince George's.
 
 I use the [`EpiEstim`][4] package to estimate the instantaneous reproduction
 number as a function of time from the incidence time series. Parameters for the
-serial interval come from a [literature review][7].
+serial interval come from a [meta-analysis][7].
 
 ## Disclaimer
 

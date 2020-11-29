@@ -72,6 +72,12 @@ df_va_tests = df_va_tests.groupby("lab_report_date").sum()
 df_va = pd.merge(left=df_va_cases, right=df_va_tests, left_index=True,
                  right_index=True, how="inner")
 
+df_va = df_va.asfreq("1d", fill_value=np.nan)
+if df_va["va_total_cases"].isna().any():
+    print("VA missing day, find out what to do")
+    sys.exit(1)
+
+
 # D.C. is not
 
 url_dc = make_url_dc()
@@ -94,10 +100,16 @@ df_dc = df_dc_excel.iloc[[1, 3], 2:-1].T
 df_dc.index = pd.to_datetime(df_dc.index)
 df_dc.rename({1: "dc_total_tests", 3: "dc_total_cases"}, axis=1, inplace=True)
 
-df_dc.loc["2020-03-20", "dc_total_tests"] = df_dc.loc[
+if pd.isna(df_dc.loc["2020-03-20", "dc_total_tests"]):
+    df_dc.loc["2020-03-20", "dc_total_tests"] = df_dc.loc[
                                             ["2020-03-19", "2020-03-21"],
                                             "dc_total_tests"].mean()
-df_dc.dropna(inplace=True)
+
+df_dc = df_dc.asfreq("1d", fill_value=np.nan)
+if df_dc["dc_total_cases"].isna().any():
+    print("DC missing day, find out what to do")
+    sys.exit(1)
+
 df_dc["dc_new_tests"] = df_dc["dc_total_tests"].diff(1)
 df_dc.loc[df_dc.index[0], "dc_new_tests"] = df_dc.loc[df_dc.index[0],
                                                       "dc_total_tests"]
@@ -151,6 +163,11 @@ df_md_json_tests.rename("md_new_tests", inplace=True)
 
 df_md = pd.merge(left=df_md_json_cases, right=df_md_json_tests, how="outer",
                  left_index=True, right_index=True)
+
+df_md = df_md.asfreq("1d", fill_value=np.nan)
+if df_md["md_total_cases"].isna().any():
+    print("MD missing day, find out what to do")
+    sys.exit(1)
 
 df = reduce(lambda left, right: pd.merge(left=left, right=right, how="inner",
             left_index=True, right_index=True), [df_va, df_dc, df_md])

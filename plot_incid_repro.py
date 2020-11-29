@@ -11,21 +11,25 @@ from scipy.stats import binom
 matplotlib.rc("font", **{"family": "sans-serif", "sans-serif": "Helvetica",
                          "weight": "bold", "size": 16})
 
+bbox_locs = {1: (1.05, 0.5), 2: (1.05, 0.0), 3: (1.05, 0.3)}
+
 incid = pd.read_csv("daily_incidence.csv")
 incid["report_date"] = pd.to_datetime(incid["report_date"])
 repro = pd.read_csv("repro_num.csv")
 
 important_dates = {
         "Stay at home orders issued": ["2020-03-30", "2020-04-06"],
-        "Memorial Day;\nphase 1 openings;\nfirst George Floyd protest":
-        ["2020-05-25", "2020-06-01"],
+        "Memorial Day;\nphase 1 openings;\nGeorge Floyd protests":
+        ["2020-05-25", "2020-06-06"],
         "Phase 2 openings": ["2020-06-12", "2020-06-22"],
         "NoVA phase 3 opening;\nIndependence Day":
         ["2020-07-01", "2020-07-08"],
         "John Lewis viewing": ["2020-07-27", "2020-08-03"],
         "Labor Day": ["2020-09-07", "2020-09-14"],
         "RBG viewing;\nACB Rose Garden event": ["2020-09-23", "2020-09-30"],
-        "Trump's positive test": ["2020-10-02", "2020-10-09"]}
+        "Trump's positive test": ["2020-10-02", "2020-10-09"],
+        "Election day;\nBiden celebration;\nMAGA march":
+        ["2020-11-03", "2020-11-14"]}
 
 delta_incid = timedelta(days=7)
 last_incid = incid["report_date"].max() - delta_incid
@@ -38,8 +42,11 @@ ax1 = fig.add_subplot(3, 1, 1)
 
 ax1.step(incid["report_date"], incid["dmv_new_cases"], where="pre")
 ax1.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
-            alpha=0.5)
+            alpha=0.5, label="Likely to change")
 ax1.set_ylabel("Daily number of\nnew positive cases")
+legax1 = ax1.legend(loc="lower left", bbox_to_anchor=bbox_locs[1])
+for legax1patch in legax1.get_patches():
+    legax1patch.set_alpha(None)
 
 ax2 = fig.add_subplot(3, 1, 2, sharex=ax1)
 
@@ -53,7 +60,11 @@ ax2.errorbar(incid["report_date"].loc[repro.index],
              repro["Median(R)"], yerr=errs, fmt="none", ecolor="tab:blue",
              alpha=0.5)
 
-colors = plt.get_cmap("tab20").colors[2:]
+colors1 = list(plt.get_cmap("tab20").colors[2:])
+colors = colors1[:11] + colors1[16:]
+lightpink = colors1[11]
+lightpuke = colors1[15]
+lightgray = colors1[13]
 
 for i, event in enumerate(important_dates.keys()):
     date_low = important_dates[event][0]
@@ -63,20 +74,11 @@ for i, event in enumerate(important_dates.keys()):
                    height=0.1, label=event, facecolor=colors[i], zorder=10)
     ax2.add_patch(pR)
 
-lim_transform2 = ax2.transData + ax2.transAxes.inverted()
+ax2.set_ylim([0.5, 1.5])
 
 ax2.axvspan(last_repro, incid["report_date"].loc[repro.index].max(),
             facecolor="gold", label="Likely to change", alpha=0.5)
-ax2.axhspan(1, 1.5,
-            xmax=lim_transform2.transform((date2num(last_repro), 0))[0],
-            facecolor=colors[11], alpha=0.5,
-            label="Pandemic won't end\nif sustained")
-ax2.axhspan(0.5, 1,
-            xmax=lim_transform2.transform((date2num(last_repro), 0))[0],
-            facecolor=colors[15], alpha=0.5,
-            label="Pandemic will eventually end\nif sustained")
 
-ax2.set_ylim([0.5, 1.5])
 ax2.set_ylabel("Reproduction number")
 
 probs = calc_prob.prob_gathering(incid)
@@ -85,39 +87,52 @@ ax3 = fig.add_subplot(3, 1, 3, sharex=ax1)
 
 ax3.step(probs.iloc[10:].index, probs.iloc[10:], where="pre")
 ax3.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
-            alpha=0.5)
+            alpha=0.5, label="Likely to change")
 
-thresh = 1.-binom.cdf(6, 10, 0.5)
-thresh_patch = Rectangle(xy=(0, thresh), width=date2num(last_incid),
-                         height=ax3.get_ylim()[1]-thresh, facecolor=colors[13],
-                         alpha=0.5, label=(
-                         "Riskier than flipping a coin\n10 times and getting\n"
-                         "7 or more heads"))
-ax3.add_patch(thresh_patch)
 
-ax3.set_ylabel(("For a gathering of 10,\nprobability "
-                "that 1 or more\npeople has virus"))
+ax3.set_ylabel(("For a gathering of 10 random\npeople, probability "
+                "that\n1 or more people has virus"))
 
 locator = MonthLocator()
 formatter = DateFormatter("%B")
 ax3.xaxis.set_major_locator(locator)
 ax3.xaxis.set_major_formatter(formatter)
 
-handles = []
-labels = []
+xlim = ax3.get_xlim()[0]
+end_patch = Rectangle(xy=(xlim, 1),
+                      width=date2num(last_repro) - xlim,
+                      height=ax2.get_ylim()[1]-1, facecolor=lightpuke,
+                      alpha=0.5,
+                      label="Pandemic will eventually end\nif sustained")
+ax2.add_patch(end_patch)
 
-for ax in [ax1, ax2, ax3]:
-    handlest, labelst = ax.get_legend_handles_labels()
-    handles += handlest
-    labels += labelst
+forever_patch = Rectangle(xy=(xlim, 0),
+                          width=date2num(last_repro) - xlim,
+                          height=1, facecolor=lightpink, alpha=0.5,
+                          label="Pandemic won't end\nif sustained")
+ax2.add_patch(forever_patch)
+handles, labels = ax2.get_legend_handles_labels()
+handles = handles[-3:] + handles[:-3]
+labels = labels[-3:] + labels[:-3]
 
-handles = [handles[-4]] + handles[-3:-1] + handles[:-4] + [handles[-1]]
-labels = [labels[-4]] + labels[-3:-1] + labels[:-4] + [labels[-1]]
+legax2 = ax2.legend(handles, labels, loc="lower left",
+                    bbox_to_anchor=bbox_locs[2], ncol=2)
 
-leg = fig.legend(handles, labels, loc='lower left', bbox_to_anchor=(0.9, 0.33))
-leg_patches = leg.get_patches()
-for leg_patch in leg_patches:
-    leg_patch.set_alpha(None)
+for legax2patch in legax2.get_patches():
+    legax2patch.set_alpha(None)
+
+thresh = 1.-binom.cdf(6, 10, 0.5)
+binom_patch = Rectangle(xy=(xlim, thresh),
+                        width=date2num(last_incid) - xlim,
+                        height=ax3.get_ylim()[1]-thresh, facecolor=lightgray,
+                        alpha=0.5, label=(
+                        "Riskier than flipping a coin\n10 times and getting\n"
+                        "7 or more heads"))
+ax3.add_patch(binom_patch)
+
+legax3 = ax3.legend(loc="lower left", bbox_to_anchor=bbox_locs[3])
+for legax3patch in legax3.get_patches():
+    legax3patch.set_alpha(None)
 
 fig.autofmt_xdate()
 fig.subplots_adjust(hspace=0.05)
@@ -132,7 +147,7 @@ today = date.today()
 fig.suptitle((
              "Pandemic statistics for the\nD.C. + NoVA + MoCo + PG's county "
              "agglomeration, "+today.strftime("%Y-%m-%d")),
-             x=0.7, y=0.92)
+             x=1, y=0.92)
 
 plt.savefig("dmv_summary_{0}.png".format(today.strftime("%Y%m%d")),
             bbox_inches="tight")

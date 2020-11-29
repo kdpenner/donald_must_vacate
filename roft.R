@@ -2,7 +2,8 @@ library(EpiEstim)
 library(distcrete)
 library(ggplot2)
 
-t <- read.table("daily_incidence.csv", header=TRUE, sep=",")
+t1 <- read.table("daily_incidence.csv", header=TRUE, sep=",")
+t <- t1[c("report_date", "dmv_new_cases")]
 t <- na.omit(t)
 
 names(t)[names(t) == "report_date"] <- "dates"

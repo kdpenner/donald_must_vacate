@@ -188,4 +188,11 @@ df.loc[df.index[0], "dc_new_cases"] = df.loc[df.index[0], "dc_total_cases"]
 df.loc[df.index[0], "md_new_cases"] = df.loc[df.index[0], "md_total_cases"]
 df.index.name = "report_date"
 
+tendaysago = timedelta(days=10)
+
+num_infectious = df.loc[df.index[-1] - tendaysago:,
+                        "dmv_new_cases"].sum() * 11.
+
+print("{0} new infections in past 10 days".format(num_infectious))
+
 df.to_csv("daily_incidence.csv")

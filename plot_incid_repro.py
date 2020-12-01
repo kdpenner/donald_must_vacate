@@ -99,17 +99,17 @@ ax3.xaxis.set_major_locator(locator)
 ax3.xaxis.set_major_formatter(formatter)
 
 xlim = ax3.get_xlim()[0]
-end_patch = Rectangle(xy=(xlim, 1),
+end_patch = Rectangle(xy=(xlim, 0),
                       width=date2num(last_repro) - xlim,
-                      height=ax2.get_ylim()[1]-1, facecolor=lightpuke,
+                      height=1, facecolor=lightpuke,
                       alpha=0.5,
                       label="Pandemic will eventually end\nif sustained")
 ax2.add_patch(end_patch)
 
-forever_patch = Rectangle(xy=(xlim, 0),
+forever_patch = Rectangle(xy=(xlim, 1),
                           width=date2num(last_repro) - xlim,
-                          height=1, facecolor=lightpink, alpha=0.5,
-                          label="Pandemic won't end\nif sustained")
+                          height=ax2.get_ylim()[1]-1, facecolor=lightpink,
+                          alpha=0.5, label="Pandemic won't end\nif sustained")
 ax2.add_patch(forever_patch)
 handles, labels = ax2.get_legend_handles_labels()
 handles = handles[-3:] + handles[:-3]

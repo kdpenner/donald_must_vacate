@@ -50,13 +50,13 @@ for legax1patch in legax1.get_patches():
 
 ax2 = fig.add_subplot(3, 1, 2, sharex=ax1)
 
-ax2.step(incid["report_date"].loc[repro.index], repro["Median(R)"],
+ax2.step(incid["report_date"].iloc[10:], repro["Median(R)"],
          where="pre")
 
 errs = [repro["Median(R)"]-repro["Quantile.0.025(R)"],
         repro["Quantile.0.975(R)"]-repro["Median(R)"]]
 
-ax2.errorbar(incid["report_date"].loc[repro.index],
+ax2.errorbar(incid["report_date"].iloc[10:],
              repro["Median(R)"], yerr=errs, fmt="none", ecolor="tab:blue",
              alpha=0.5)
 
@@ -76,7 +76,7 @@ for i, event in enumerate(important_dates.keys()):
 
 ax2.set_ylim([0.5, 1.5])
 
-ax2.axvspan(last_repro, incid["report_date"].loc[repro.index].max(),
+ax2.axvspan(last_repro, incid["report_date"].iloc[-1],
             facecolor="gold", label="Likely to change", alpha=0.5)
 
 ax2.set_ylabel("Reproduction number")

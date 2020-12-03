@@ -77,6 +77,7 @@ if df_va["va_total_cases"].isna().any():
     print("VA missing day, find out what to do")
     sys.exit(1)
 
+print("Last VA day is {0}".format(df_va.index[-1].strftime("%Y-%m-%d")))
 
 # D.C. is not
 
@@ -96,7 +97,9 @@ if df_dc_excel.iloc[3, 1] != "Total Positives":
     print("DC file format has changed")
     sys.exit(1)
 
-df_dc = df_dc_excel.iloc[[1, 3], 2:-1].T
+df_dc = df_dc_excel.iloc[[1, 3], 2:].T
+if df_dc.iloc[-1, :].isna().any():
+    df_dc = df_dc.iloc[:-1, :]
 df_dc.index = pd.to_datetime(df_dc.index)
 df_dc.rename({1: "dc_total_tests", 3: "dc_total_cases"}, axis=1, inplace=True)
 
@@ -169,13 +172,15 @@ if df_md["md_total_cases"].isna().any():
     print("MD missing day, find out what to do")
     sys.exit(1)
 
+print("Last MD day is {0}".format(df_md.index[-1].strftime("%Y-%m-%d")))
+
 df = reduce(lambda left, right: pd.merge(left=left, right=right, how="inner",
             left_index=True, right_index=True), [df_va, df_dc, df_md])
 
 mask_total_cases = df.columns.str.contains("_total_cases")
 df["dmv_total_cases"] = df.loc[:, mask_total_cases].sum(axis=1)
-mask_new_cases = df.columns.str.contains("_new_tests")
-df["dmv_new_tests"] = df.loc[:, mask_new_cases].sum(axis=1)
+mask_new_tests = df.columns.str.contains("_new_tests")
+df["dmv_new_tests"] = df.loc[:, mask_new_tests].sum(axis=1, min_count=3)
 
 df["dmv_new_cases"] = df["dmv_total_cases"].diff(1)
 df["va_new_cases"] = df["va_total_cases"].diff(1)

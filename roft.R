@@ -23,6 +23,4 @@ config <- make_config(list(si_distr=si_discrete,
 
 roft <- estimate_R(t, method="non_parametric_si", config=config)
 
-plot(roft, legend=FALSE)
-
 write.csv(roft$R, "repro_num.csv", row.names=FALSE)

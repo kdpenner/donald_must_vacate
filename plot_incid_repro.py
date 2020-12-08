@@ -36,6 +36,8 @@ last_incid = incid["report_date"].max() - delta_incid
 delta_repro = timedelta(days=17)
 last_repro = incid["report_date"].max() - delta_repro
 
+rt_offset = timedelta(days=5)
+
 fig = plt.figure(figsize=(7, 15))
 
 ax1 = fig.add_subplot(3, 1, 1)
@@ -50,18 +52,18 @@ for legax1patch in legax1.get_patches():
 
 ax2 = fig.add_subplot(3, 1, 2, sharex=ax1)
 
-ax2.step(incid["report_date"].iloc[10:], repro["Median(R)"],
+ax2.step(incid["report_date"].iloc[10:]-rt_offset, repro["Median(R)"],
          where="pre")
 
 errs = [repro["Median(R)"]-repro["Quantile.0.025(R)"],
         repro["Quantile.0.975(R)"]-repro["Median(R)"]]
 
-ax2.errorbar(incid["report_date"].iloc[10:],
+ax2.errorbar(incid["report_date"].iloc[10:]-rt_offset,
              repro["Median(R)"], yerr=errs, fmt="none", ecolor="tab:blue",
              alpha=0.5)
 
 colors1 = list(plt.get_cmap("tab20").colors[2:])
-colors = colors1[:11] + colors1[16:]
+colors = colors1[:5] + colors1[6:10] + colors1[16:]
 lightpink = colors1[11]
 lightpuke = colors1[15]
 lightgray = colors1[13]

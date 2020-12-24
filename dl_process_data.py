@@ -10,21 +10,7 @@ from sodapy import Socrata
 import numpy as np
 
 
-def make_url_dc(offset=timedelta()):
-    date_ = date.today() - offset
-    month = date_.strftime("%B-")
-    dayofmonth = date_.strftime("%d")
-    dayofmonth = dayofmonth.lstrip("0")
-    year = date_.strftime("-%Y")
-    date_str = month + dayofmonth + year
-    base_url_dc = (r"https://coronavirus.dc.gov/sites/default/files/dc/sites/"
-                   "coronavirus/page_content/attachments/")
-    fname_dc = "DC-COVID-19-Data-for-" + date_str + ".xlsx"
-    full_url_dc = base_url_dc + fname_dc
-    return full_url_dc
-
-
-# Virginia is professional
+# Virginia
 
 apptoken = os.environ.get("VDH_APPTOKEN")
 
@@ -86,34 +72,28 @@ if df_va["va_total_cases"].isna().any():
 
 print("Last VA day is {0}".format(df_va.index[-1].strftime("%Y-%m-%d")))
 
-# D.C. is not
+# D.C.
 
-url_dc = make_url_dc()
+url_dc = ("https://em.dcgis.dc.gov/dcgis/rest/services/COVID_19/"
+          "OpenData_COVID19/FeatureServer/3/query?outFields=DATE_REPORTED,"
+          "OVERALL_TESTED_TST,TOTAL_POSITIVES_TST&where=1=1&"
+          "returnGeometry=false&f=json")
 
 req_dc = requests.get(url_dc)
-offset_day = timedelta(days=1)
 
-while req_dc.status_code != 200:
-    url_dc = make_url_dc(offset=offset_day)
-    req_dc = requests.get(url_dc)
-    offset_day += timedelta(days=1)
+json_dc = json.loads(req_dc.content)
 
-print("URL: "+url_dc)
-df_dc_excel = pd.read_excel(io.BytesIO(req_dc.content))
-if df_dc_excel.iloc[3, 1] != "Total Positives":
-    print("DC file format has changed")
-    sys.exit(1)
+json_dc_features = [feature["attributes"] for feature in json_dc["features"]]
 
-df_dc = df_dc_excel.iloc[[1, 3], 2:].T
-if df_dc.iloc[-1, :].isna().any():
-    df_dc = df_dc.iloc[:-1, :]
-df_dc.index = pd.to_datetime(df_dc.index)
-df_dc.rename({1: "dc_total_tests", 3: "dc_total_cases"}, axis=1, inplace=True)
+df_dc = pd.DataFrame(json_dc_features)
 
-if pd.isna(df_dc.loc["2020-03-20", "dc_total_tests"]):
-    df_dc.loc["2020-03-20", "dc_total_tests"] = df_dc.loc[
-                                            ["2020-03-19", "2020-03-21"],
-                                            "dc_total_tests"].mean()
+df_dc.index = pd.to_datetime(df_dc["DATE_REPORTED"], unit="ms").dt.date
+df_dc.drop("DATE_REPORTED", axis=1, inplace=True)
+df_dc.sort_index(inplace=True)
+df_dc.dropna(inplace=True)
+
+df_dc.rename({"OVERALL_TESTED_TST": "dc_total_tests",
+              "TOTAL_POSITIVES_TST": "dc_total_cases"}, axis=1, inplace=True)
 
 # D.C. resample
 
@@ -127,12 +107,15 @@ df_dc.loc[df_dc.index[0], "dc_new_tests"] = df_dc.loc[df_dc.index[0],
                                                       "dc_total_tests"]
 df_dc.drop("dc_total_tests", axis=1, inplace=True)
 
-# MD is inbetween
+print("Last D.C. day is {0}".format(df_dc.index[-1].strftime("%Y-%m-%d")))
+
+# MD
+
+md_base = "https://services.arcgis.com/njFNhDsUCentVYJW/arcgis/rest/services/"
 
 # MD cases
 
-url_md_cases = (r"https://services.arcgis.com/njFNhDsUCentVYJW/arcgis/rest/"
-                "services/MDCOVID19_CasesByCounty/FeatureServer/0/query?"
+url_md_cases = (md_base + "MDCOVID19_CasesByCounty/FeatureServer/0/query?"
                 "where=1=1&outFields=DATE,Montgomery,Prince_Georges&"
                 "returnGeometry=false&f=json")
 
@@ -149,9 +132,10 @@ df_md_json_cases["md_total_cases"] = df_md_json_cases.sum(axis=1)
 
 # MD tests
 
-url_md_tests = (r"https://services.arcgis.com/njFNhDsUCentVYJW/arcgis/rest/"
-                "services/MDCOVID19_DailyTestingVolumeByCounty/FeatureServer/"
-                "0/query?outFields=*&where=1=1&f=json&returnGeometry=false")
+url_md_tests = (md_base + r"MDCOVID19_DailyTestingVolumeByCounty/"
+                "FeatureServer/0/query?outFields=*&"
+                "where=County='Montgomery' OR County='Prince George''s'&"
+                "f=json&returnGeometry=false")
 
 req_md_tests = requests.get(url_md_tests)
 
@@ -159,14 +143,13 @@ json_md_tests = json.loads(req_md_tests.content)
 json_md_tests_features = []
 
 for county in json_md_tests["features"]:
-    if county["attributes"]["County"] in ["Montgomery", "Prince George\'s"]:
-        for test_date in county["attributes"].keys():
-            if test_date not in ["OBJECTID", "County"]:
-                t = {
-                     "Date": test_date,
-                     county["attributes"]["County"]:
-                     county["attributes"][test_date]}
-                json_md_tests_features.append(t)
+    for test_date in county["attributes"].keys():
+        if test_date not in ["OBJECTID", "County"]:
+            t = {
+                 "Date": test_date,
+                 county["attributes"]["County"]:
+                 county["attributes"][test_date]}
+            json_md_tests_features.append(t)
 
 df_md_json_tests = pd.DataFrame(json_md_tests_features)
 df_md_json_tests["Date"] = df_md_json_tests["Date"].str.lstrip("d_")
@@ -177,8 +160,7 @@ df_md_json_tests.rename("md_new_tests", inplace=True)
 
 # MD percent positive and extension of test data
 
-url_md_pos = (r"https://services.arcgis.com/njFNhDsUCentVYJW/arcgis/rest/"
-              "services/MDCOVID19_PosPercentByJursidiction/FeatureServer/"
+url_md_pos = (md_base + "MDCOVID19_PosPercentByJursidiction/FeatureServer/"
               "0/query?outFields=ReportDate,Montgomery_Percent_Positive,"
               "PrinceGeorges_Percent_Positive&where=1=1&f=json&"
               "returnGeometry=false")
@@ -197,6 +179,7 @@ df_md_json_pos.drop("ReportDate", axis=1, inplace=True)
 
 df_md_extend = pd.merge(left=df_md_json_cases, right=df_md_json_pos,
                         how="left", left_index=True, right_index=True)
+df_md_extend.sort_values("DATE", inplace=True)
 
 moco_new_cases = df_md_extend["Montgomery"].diff(1)
 pgs_new_cases = df_md_extend["Prince_Georges"].diff(1)
@@ -235,6 +218,7 @@ print("Last MD day is {0}".format(df_md.index[-1].strftime("%Y-%m-%d")))
 
 df = reduce(lambda left, right: pd.merge(left=left, right=right, how="inner",
             left_index=True, right_index=True), [df_va, df_dc, df_md])
+df.sort_index(inplace=True)
 
 # Cases
 

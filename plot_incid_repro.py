@@ -3,15 +3,25 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.dates import date2num, datestr2num, MonthLocator, DateFormatter
+from matplotlib.text import Text
 from datetime import date, timedelta
 import calc_prob
 from scipy.stats import binom
+import string
+
+
+class HandlerText:
+    def legend_artist(self, legend, orig_handle, fontsize, handlebox):
+        x0, y0 = handlebox.xdescent, handlebox.ydescent
+        handle_text = Text(x=x0, y=y0, text=orig_handle.get_text())
+        handlebox.add_artist(handle_text)
+        return handle_text
 
 
 matplotlib.rc("font", **{"family": "sans-serif", "sans-serif": "Helvetica",
                          "weight": "bold", "size": 16})
 
-bbox_locs = {1: (1.05, 0.5), 2: (1.05, 0.0), 3: (1.05, 0.3)}
+bbox_locs = {1: (1.05, 0.5), 2: (1.05, -0.1), 3: (1.05, 0.3)}
 
 incid = pd.read_csv("daily_incidence.csv")
 incid["report_date"] = pd.to_datetime(incid["report_date"])
@@ -29,7 +39,8 @@ important_dates = {
         "RBG viewing;\nACB Rose Garden event": ["2020-09-23", "2020-09-30"],
         "Trump's positive test": ["2020-10-02", "2020-10-09"],
         "Election day;\nBiden celebration;\nMAGA march":
-        ["2020-11-03", "2020-11-14"]}
+        ["2020-11-03", "2020-11-14"],
+        "Thanksgiving": ["2020-11-26", "2020-12-03"]}
 
 delta_incid = timedelta(days=7)
 last_incid = incid["report_date"].max() - delta_incid
@@ -62,19 +73,10 @@ ax2.errorbar(incid["report_date"].iloc[10:]-rt_offset,
              repro["Median(R)"], yerr=errs, fmt="none", ecolor="tab:blue",
              alpha=0.5)
 
-colors1 = list(plt.get_cmap("tab20").colors[2:])
-colors = colors1[:5] + colors1[6:10] + colors1[16:]
-lightpink = colors1[11]
-lightpuke = colors1[15]
-lightgray = colors1[13]
-
-for i, event in enumerate(important_dates.keys()):
-    date_low = important_dates[event][0]
-    date_high = important_dates[event][1]
-    pR = Rectangle(xy=(datestr2num(date_low), 0.8),
-                   width=datestr2num(date_high) - datestr2num(date_low),
-                   height=0.1, label=event, facecolor=colors[i], zorder=10)
-    ax2.add_patch(pR)
+colors = list(plt.get_cmap("tab20").colors[2:])
+lightpink = colors[11]
+lightpuke = colors[15]
+lightgray = colors[13]
 
 ax2.set_ylim([0.5, 1.5])
 
@@ -113,12 +115,26 @@ forever_patch = Rectangle(xy=(xlim, 1),
                           height=ax2.get_ylim()[1]-1, facecolor=lightpink,
                           alpha=0.5, label="Pandemic won't end\nif sustained")
 ax2.add_patch(forever_patch)
+
 handles, labels = ax2.get_legend_handles_labels()
-handles = handles[-3:] + handles[:-3]
-labels = labels[-3:] + labels[:-3]
+handles = [handles[0]] + list(reversed(handles[1:]))
+labels = [labels[0]] + list(reversed(labels[1:]))
+
+for i, event in enumerate(important_dates.keys()):
+    ann_letter = string.ascii_uppercase[i]
+    date_low = important_dates[event][0]
+    date_high = important_dates[event][1]
+#     pR = Rectangle(xy=(datestr2num(date_low), 0.8),
+#                    width=datestr2num(date_high) - datestr2num(date_low),
+#                    height=0.1, label=event, facecolor=colors[i], zorder=10)
+#     ax2.add_patch(pR)
+    let = ax2.text(x=datestr2num(date_low), y=0.8, s=ann_letter, label=event)
+    handles.append(let)
+    labels.append(let.get_label())
 
 legax2 = ax2.legend(handles, labels, loc="lower left",
-                    bbox_to_anchor=bbox_locs[2], ncol=2)
+                    bbox_to_anchor=bbox_locs[2], ncol=2,
+                    handler_map={Text: HandlerText()})
 
 for legax2patch in legax2.get_patches():
     legax2patch.set_alpha(None)

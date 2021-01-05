@@ -1,12 +1,12 @@
 # The Donald Must Vacate Project: Pandemic statistics for the DMV
 
-Northern Virginia, D.C., and counties in southern Maryland compose a
-metropolitan area that should not be considered as 3 independent jurisdictions.
-Additionally, southwestern Virginia is culturally different, and distant, from
-northern Virginia. Saying "cases in Virginia are rising" can mean that cases in
-northern VA are flat while those in southwestern VA are rising. Here are
-pandemic statistics relevant to the immediate and complete environment of the
-DMV.
+Northern Virginia, D.C., Montgomery county, and Prince George's county compose
+a metropolitan area that should not be considered as 3 independent
+jurisdictions. Additionally, southwestern Virginia is culturally different, and
+distant, from northern Virginia. Saying "cases in Virginia are rising" can mean
+that cases in northern VA are flat while those in southwestern VA are rising.
+Here are pandemic statistics relevant to the immediate and complete environment
+of the DMV.
 
 First is the daily number of new cases as a function of time for the
 agglomeration.
@@ -50,15 +50,14 @@ of time.
 An infected person is contagious for an estimated [10 days][3]. This number is
 uncertain to a few days.
 
-The number of contagious people is estimated to be [11 times][2] the number of
-people who've tested positive. The true multiplicative factor, with plausible
-values between 6 and 24, may be a function of region. [State-by-state
-estimates][5] may be [low][6].
+At the beginning of the pandemic the number of contagious people was estimated
+to be [11 times][2] the number of people who tested positive. The true
+multiplicative factor may be a function of region. [State-by-state
+estimates][5] may be [low][6]. I've assumed a value of 5.
 
 Let's assume that for every 1 person who tests positive and isolates for 10
-days, 10 other people are contagious and free to infect the population. If
-1,000 people have tested positive in the past 10 days, 10,000 people are
-roaming free.
+days, 4 other people are contagious and free to infect the population. If 1,000
+people have tested positive in the past 10 days, 4,000 people are roaming free.
 
 If you go to a gathering of 10 random people, some of these people won't be
 infected. The remainder may be. The probability shown in the bottom plot is the
@@ -67,7 +66,7 @@ the probability is 1, one or more people are infected---there is no doubt. If
 the probability is 0, no person is infected---there is no doubt. If the
 probability is 0.2, you are more certain that one or more people are infected
 than if the probability is 0.1. To have a feel for a reasonable risk threshold:
-0.17 is the probability of getting 7 or more heads after flipping a coin 10
+0.05 is the probability of getting 8 or more heads after flipping a coin 10
 times.
 
 Credit for this idea goes to [Chande et al. (2020)][3]. The model is very

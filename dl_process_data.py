@@ -97,10 +97,7 @@ df_dc.rename({"OVERALL_TESTED_TST": "dc_total_tests",
 
 # D.C. resample
 
-df_dc = df_dc.asfreq("1d", fill_value=np.nan)
-if df_dc["dc_total_cases"].isna().any():
-    print("DC missing day, find out what to do")
-    sys.exit(1)
+df_dc = df_dc.asfreq("1d", method="pad")
 
 df_dc["dc_new_tests"] = df_dc["dc_total_tests"].diff(1)
 df_dc.loc[df_dc.index[0], "dc_new_tests"] = df_dc.loc[df_dc.index[0],
@@ -244,7 +241,7 @@ df["dmv_new_tests"] = df.loc[:, mask_new_tests].sum(axis=1, min_count=3)
 tendaysago = timedelta(days=10)
 
 num_infectious = df.loc[df.index[-1] - tendaysago:,
-                        "dmv_new_cases"].sum() * 11.
+                        "dmv_new_cases"].sum() * 5.
 
 print("{0} new infections in past 10 days".format(num_infectious))
 

@@ -36,11 +36,12 @@ important_dates = {
         ["2020-07-01", "2020-07-08"],
         "John Lewis viewing": ["2020-07-27", "2020-08-03"],
         "Labor Day": ["2020-09-07", "2020-09-14"],
-        "RBG viewing;\nACB Rose Garden event": ["2020-09-23", "2020-09-30"],
-        "Trump's positive test": ["2020-10-02", "2020-10-09"],
+        "RBG viewing;\nACB Rose Garden event\nTrump's positive test":
+        ["2020-09-23", "2020-10-02"],
         "Election day;\nBiden celebration;\nMAGA march":
         ["2020-11-03", "2020-11-14"],
-        "Thanksgiving": ["2020-11-26", "2020-12-03"]}
+        "Thanksgiving": ["2020-11-26", "2020-12-03"],
+        "Christmas; New Year's": ["2020-12-25", "2020-01-01"]}
 
 delta_incid = timedelta(days=7)
 last_incid = incid["report_date"].max() - delta_incid
@@ -139,13 +140,13 @@ legax2 = ax2.legend(handles, labels, loc="lower left",
 for legax2patch in legax2.get_patches():
     legax2patch.set_alpha(None)
 
-thresh = 1.-binom.cdf(6, 10, 0.5)
+thresh = 1.-binom.cdf(7, 10, 0.5)
 binom_patch = Rectangle(xy=(xlim, thresh),
                         width=date2num(last_incid) - xlim,
                         height=ax3.get_ylim()[1]-thresh, facecolor=lightgray,
                         alpha=0.5, label=(
                         "Riskier than flipping a coin\n10 times and getting\n"
-                        "7 or more heads"))
+                        "8 or more heads"))
 ax3.add_patch(binom_patch)
 
 legax3 = ax3.legend(loc="lower left", bbox_to_anchor=bbox_locs[3])

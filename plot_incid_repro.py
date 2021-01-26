@@ -21,7 +21,7 @@ class HandlerText:
 matplotlib.rc("font", **{"family": "sans-serif", "sans-serif": "Helvetica",
                          "weight": "bold", "size": 16})
 
-bbox_locs = {1: (1.05, 0.5), 2: (1.05, -0.1), 3: (1.05, 0.3)}
+bbox_locs = {1: (1.05, 0.5), 2: (1.05, -0.1), 3: (1.05, 0.2)}
 
 incid = pd.read_csv("daily_incidence.csv")
 incid["report_date"] = pd.to_datetime(incid["report_date"])
@@ -41,7 +41,8 @@ important_dates = {
         "Election day;\nBiden celebration;\nMAGA march":
         ["2020-11-03", "2020-11-14"],
         "Thanksgiving": ["2020-11-26", "2020-12-03"],
-        "Christmas; New Year's": ["2020-12-25", "2020-01-01"]}
+        "Christmas; New Year's": ["2020-12-25", "2020-01-01"],
+        "Invasion by the\nbasket of deplorables": ["2021-01-06"]}
 
 delta_incid = timedelta(days=7)
 last_incid = incid["report_date"].max() - delta_incid
@@ -124,11 +125,6 @@ labels = [labels[0]] + list(reversed(labels[1:]))
 for i, event in enumerate(important_dates.keys()):
     ann_letter = string.ascii_uppercase[i]
     date_low = important_dates[event][0]
-    date_high = important_dates[event][1]
-#     pR = Rectangle(xy=(datestr2num(date_low), 0.8),
-#                    width=datestr2num(date_high) - datestr2num(date_low),
-#                    height=0.1, label=event, facecolor=colors[i], zorder=10)
-#     ax2.add_patch(pR)
     let = ax2.text(x=datestr2num(date_low), y=0.8, s=ann_letter, label=event)
     handles.append(let)
     labels.append(let.get_label())
@@ -140,18 +136,27 @@ legax2 = ax2.legend(handles, labels, loc="lower left",
 for legax2patch in legax2.get_patches():
     legax2patch.set_alpha(None)
 
-thresh = 1.-binom.cdf(7, 10, 0.5)
-binom_patch = Rectangle(xy=(xlim, thresh),
-                        width=date2num(last_incid) - xlim,
-                        height=ax3.get_ylim()[1]-thresh, facecolor=lightgray,
-                        alpha=0.5, label=(
-                        "Riskier than flipping a coin\n10 times and getting\n"
-                        "8 or more heads"))
-ax3.add_patch(binom_patch)
+thresh7 = 1.-binom.cdf(7, 10, 0.5)
+binom_patch7 = Rectangle(xy=(xlim, thresh7),
+                         width=date2num(last_incid) - xlim,
+                         height=ax3.get_ylim()[1]-thresh7, facecolor=lightgray,
+                         alpha=0.5, label=(
+                         "Riskier than flipping a coin\n10 times and getting\n"
+                         "8 or more heads\n(includes darker shaded region)"))
+ax3.add_patch(binom_patch7)
 
-legax3 = ax3.legend(loc="lower left", bbox_to_anchor=bbox_locs[3])
-for legax3patch in legax3.get_patches():
-    legax3patch.set_alpha(None)
+thresh6 = 1.-binom.cdf(6, 10, 0.5)
+binom_patch6 = Rectangle(xy=(xlim, thresh6),
+                         width=date2num(last_incid) - xlim,
+                         height=ax3.get_ylim()[1]-thresh6, facecolor=lightgray,
+                         alpha=1, label=(
+                         "Riskier than flipping a coin\n10 times and getting\n"
+                         "7 or more heads"))
+ax3.add_patch(binom_patch6)
+
+legax3 = ax3.legend(loc="lower left", bbox_to_anchor=bbox_locs[3], ncol=2)
+legax3patches = legax3.get_patches()
+legax3patches[0].set_alpha(None)
 
 fig.autofmt_xdate()
 fig.subplots_adjust(hspace=0.05)
@@ -164,7 +169,7 @@ fig.text(0, 0.08, (
 today = date.today()
 
 fig.suptitle((
-             "Pandemic statistics for the\nD.C. + NoVA + MoCo + PG's county "
+             "Pandemic statistics for the\nD.C. + NoVA + MoCo + PG's County "
              "agglomeration, "+today.strftime("%Y-%m-%d")),
              x=1, y=0.92)
 

@@ -1,6 +1,6 @@
 # The Donald Must Vacate Project: Pandemic statistics for the DMV
 
-Northern Virginia, D.C., Montgomery county, and Prince George's county compose
+Northern Virginia, D.C., Montgomery County, and Prince George's County compose
 a metropolitan area that should not be considered as 3 independent
 jurisdictions. Additionally, southwestern Virginia is culturally different, and
 distant, from northern Virginia. Saying "cases in Virginia are rising" can mean

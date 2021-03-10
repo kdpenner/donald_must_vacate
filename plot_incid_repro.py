@@ -2,12 +2,13 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-from matplotlib.dates import date2num, datestr2num, MonthLocator, DateFormatter
+from matplotlib.dates import datestr2num, MonthLocator, DateFormatter
 from matplotlib.text import Text
 from datetime import date, timedelta
 import calc_prob
 from scipy.stats import binom
 import string
+import get_pop
 
 
 class HandlerText:
@@ -21,7 +22,7 @@ class HandlerText:
 matplotlib.rc("font", **{"family": "sans-serif", "sans-serif": "Helvetica",
                          "weight": "bold", "size": 16})
 
-bbox_locs = {1: (1.05, 0.5), 2: (1.05, 0.), 3: (1.05, 0.)}
+bbox_locs = {1: (1.05, 0.5), 2: (1.05, 0.), 3: (1.05, 0.), 4: (1.05, 0.)}
 
 incid = pd.read_csv("daily_incidence.csv")
 incid["report_date"] = pd.to_datetime(incid["report_date"])
@@ -51,9 +52,9 @@ important_dates = {
 
 rt_offset = timedelta(days=5)
 
-fig = plt.figure(figsize=(10, 15))
+fig = plt.figure(figsize=(10, 20))
 
-ax1 = fig.add_subplot(3, 1, 1)
+ax1 = fig.add_subplot(4, 1, 1)
 
 ax1.step(incid["report_date"], incid["dmv_new_cases"], where="pre")
 # ax1.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
@@ -63,7 +64,7 @@ ax1.set_ylabel("Daily number of\nnew positive cases")
 # for legax1patch in legax1.get_patches():
 #     legax1patch.set_alpha(None)
 
-ax2 = fig.add_subplot(3, 1, 2, sharex=ax1)
+ax2 = fig.add_subplot(4, 1, 2, sharex=ax1)
 
 ax2.step(incid["report_date"].iloc[10:]-rt_offset, repro["Median(R)"],
          where="pre")
@@ -87,9 +88,10 @@ ax2.set_ylim([0.5, 1.5])
 
 ax2.set_ylabel("Reproduction number")
 
-probs = calc_prob.prob_gathering(incid)
+total_pop = get_pop.dmv_pop()
+probs = calc_prob.prob_gathering(incid, total_pop)
 
-ax3 = fig.add_subplot(3, 1, 3, sharex=ax1)
+ax3 = fig.add_subplot(4, 1, 3, sharex=ax1)
 
 ax3.step(probs.iloc[10:].index, probs.iloc[10:], where="pre")
 # ax3.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
@@ -99,12 +101,25 @@ ax3.step(probs.iloc[10:].index, probs.iloc[10:], where="pre")
 ax3.set_ylabel(("For a gathering of 10 random\npeople, probability "
                 "that\n1 or more people has virus"))
 
+ax4 = fig.add_subplot(4, 1, 4, sharex=ax1)
+
+ax4.step(incid["report_date"], incid["dmv_total_cases"]/total_pop*100.,
+         label="% having been a case",
+         where="pre", color="tab:blue")
+ax4.step(incid["report_date"], incid["dmv_vaccinated"]/total_pop*100.,
+         label="% fully vaccinated", where="pre",
+         color="tab:orange")
+
+ax4.set_ylabel("Percentage of\nDMV population")
+
+ax4.legend(loc="lower left", bbox_to_anchor=bbox_locs[4])
+
 locator = MonthLocator()
 formatter = DateFormatter("%B")
-ax3.xaxis.set_major_locator(locator)
-ax3.xaxis.set_major_formatter(formatter)
+ax4.xaxis.set_major_locator(locator)
+ax4.xaxis.set_major_formatter(formatter)
 
-xlimlo, xlimhi = ax3.get_xlim()
+xlimlo, xlimhi = ax4.get_xlim()
 end_patch = Rectangle(xy=(xlimlo, 0),
                       width=xlimhi - xlimlo,
                       height=1, facecolor=lightpuke,
@@ -162,7 +177,7 @@ legax3 = ax3.legend(loc="lower left", bbox_to_anchor=bbox_locs[3], ncol=1)
 
 fig.autofmt_xdate()
 fig.subplots_adjust(hspace=0.05)
-fig.text(0, 0.08, (
+fig.text(0, 0.1, (
                 "The Donald Must Vacate Project\n"
                 "Data: Virginia, D.C., and Maryland departments of health; "
                 "Census Bureau\n"

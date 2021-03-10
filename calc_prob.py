@@ -1,7 +1,4 @@
-import get_pop
-
-
-def prob_gathering(incid):
+def prob_gathering(incid, total_pop):
 
     incid = incid.set_index("report_date")
 
@@ -10,8 +7,6 @@ def prob_gathering(incid):
     ascertainment_bias = 5.
 
     infectious_asym = infectious_det * (ascertainment_bias - 1)
-
-    total_pop = get_pop.dmv_pop()
 
     frac_asym = infectious_asym/total_pop
 

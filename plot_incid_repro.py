@@ -43,7 +43,10 @@ important_dates = {
         ["2020-11-03", "2020-11-14"],
         "Thanksgiving": ["2020-11-26", "2020-12-03"],
         "Christmas; New Year's": ["2020-12-25", "2020-01-01"],
-        "Invasion by the\nbasket of deplorables": ["2021-01-06"]}
+        "Invasion by the\nbasket of deplorables": ["2021-01-06"],
+        "VA loosens restrictions": ["2021-03-01"],
+        "MD loosens restrictions": ["2021-03-12"],
+        "D.C. loosens restrictions": ["2021-03-22"]}
 
 # delta_incid = timedelta(days=7)
 # last_incid = incid["report_date"].max() - delta_incid
@@ -104,10 +107,10 @@ ax3.set_ylabel(("For a gathering of 10 random\npeople, probability "
 ax4 = fig.add_subplot(4, 1, 4, sharex=ax1)
 
 ax4.step(incid["report_date"], incid["dmv_total_cases"]/total_pop*100.,
-         label="% having been a case",
+         label="% of population\nhaving been a case",
          where="pre", color="tab:blue")
 ax4.step(incid["report_date"], incid["dmv_vaccinated"]/total_pop*100.,
-         label="% fully vaccinated", where="pre",
+         label="% of population\nfully vaccinated", where="pre",
          color="tab:orange")
 
 ax4.set_ylabel("Percentage of\nDMV population")

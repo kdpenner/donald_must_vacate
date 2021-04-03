@@ -244,8 +244,9 @@ df_md_extend.drop(["Montgomery", "Prince_Georges",
 # MD vaccines
 
 url_md_vaccines = (md_base + "MD_COVID19_TotalVaccinationsCounty"
-                   "FirstandSecondDose/FeatureServer/0/query?"
-                   "outFields=VACCINATION_DATE,CumulativeSecondDose&"
+                   "FirstandSecondSingleDose/FeatureServer/0/query?"
+                   "outFields=VACCINATION_DATE,SecondDoseCumulative,"
+                   "SingleDoseCumulative&"
                    "where=County='Montgomery' OR County='Prince George''s'&"
                    "returnGeometry=false&f=json")
 
@@ -258,11 +259,9 @@ df_md_json_vaccines = pd.DataFrame(json_md_vaccines_features)
 df_md_json_vaccines.index = pd.to_datetime(
     df_md_json_vaccines["VACCINATION_DATE"], unit="ms").dt.date
 df_md_json_vaccines = df_md_json_vaccines.drop("VACCINATION_DATE", axis=1)
-df_md_json_vaccines = df_md_json_vaccines[
-    df_md_json_vaccines.index > pd.to_datetime("2020-12-01")]
 df_md_json_vaccines = df_md_json_vaccines.groupby("VACCINATION_DATE").sum()
-df_md_json_vaccines.rename({"CumulativeSecondDose": "md_vaccinated"},
-                           axis=1, inplace=True)
+df_md_json_vaccines = df_md_json_vaccines.sum(axis=1)
+df_md_json_vaccines.rename("md_vaccinated", inplace=True)
 
 # MD merge and resample
 

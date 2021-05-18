@@ -46,12 +46,8 @@ important_dates = {
         "Invasion by the\nbasket of deplorables": ["2021-01-06"],
         "VA loosens restrictions": ["2021-03-01"],
         "MD loosens restrictions": ["2021-03-12"],
-        "D.C. loosens restrictions": ["2021-03-22"]}
-
-# delta_incid = timedelta(days=7)
-# last_incid = incid["report_date"].max() - delta_incid
-# delta_repro = timedelta(days=17)
-# last_repro = incid["report_date"].max() - delta_repro
+        "D.C. loosens restrictions": ["2021-03-22"],
+        "Vaccine available to\ngeneral public": ["2021-04-18"]}
 
 rt_offset = timedelta(days=5)
 
@@ -60,21 +56,16 @@ fig = plt.figure(figsize=(10, 20))
 ax1 = fig.add_subplot(4, 1, 1)
 
 ax1.step(incid["report_date"], incid["dmv_new_cases"], where="pre")
-# ax1.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
-#             alpha=0.5, label="Likely to change")
 ax1.set_ylabel("Daily number of\nnew positive cases")
 # legax1 = ax1.legend(loc="lower left", bbox_to_anchor=bbox_locs[1])
 # for legax1patch in legax1.get_patches():
 #     legax1patch.set_alpha(None)
 
 ax2 = fig.add_subplot(4, 1, 2, sharex=ax1)
-
 ax2.step(incid["report_date"].iloc[10:]-rt_offset, repro["Median(R)"],
          where="pre")
-
 errs = [repro["Median(R)"]-repro["Quantile.0.025(R)"],
         repro["Quantile.0.975(R)"]-repro["Median(R)"]]
-
 ax2.errorbar(incid["report_date"].iloc[10:]-rt_offset,
              repro["Median(R)"], yerr=errs, fmt="none", ecolor="tab:blue",
              alpha=0.5)
@@ -85,41 +76,31 @@ lightpuke = colors[15]
 lightgray = colors[13]
 
 ax2.set_ylim([0.5, 1.5])
-
-# ax2.axvspan(last_repro, incid["report_date"].iloc[-1],
-#             facecolor="gold", label="Likely to change", alpha=0.5)
-
 ax2.set_ylabel("Reproduction number")
 
 total_pop = get_pop.dmv_pop()
 probs = calc_prob.prob_gathering(incid, total_pop)
 
 ax3 = fig.add_subplot(4, 1, 3, sharex=ax1)
-
 ax3.step(probs.iloc[10:].index, probs.iloc[10:], where="pre")
-# ax3.axvspan(last_incid, incid["report_date"].max(), facecolor="gold",
-#             alpha=0.5, label="Likely to change")
-
-
 ax3.set_ylabel(("For a gathering of 10 random\npeople, probability "
                 "that\n1 or more people has virus"))
 
 ax4 = fig.add_subplot(4, 1, 4, sharex=ax1)
-
 ax4.step(incid["report_date"], incid["dmv_total_cases"]/total_pop*100.,
-         label="% of population\nhaving been a case",
+         label="% of population having been a case",
          where="pre", color="tab:blue")
 ax4.step(incid["report_date"], incid["dmv_vaccinated"]/total_pop*100.,
-         label="% of population\nfully vaccinated", where="pre",
-         color="tab:orange")
-
+         label="% of population having completed vaccine regimen",
+         where="pre", color="tab:orange")
 ax4.set_ylabel("Percentage of\nDMV population")
-
 ax4.legend(loc="lower left", bbox_to_anchor=bbox_locs[4])
 
-locator = MonthLocator()
-formatter = DateFormatter("%B")
-ax4.xaxis.set_major_locator(locator)
+maj_locator = MonthLocator(bymonth=range(0, 13, 3))
+min_locator = MonthLocator(bymonth=[1, 2, 4, 5, 7, 8, 10, 11])
+formatter = DateFormatter("%Y %b")
+ax4.xaxis.set_major_locator(maj_locator)
+ax4.xaxis.set_minor_locator(min_locator)
 ax4.xaxis.set_major_formatter(formatter)
 
 xlimlo, xlimhi = ax4.get_xlim()
@@ -137,8 +118,6 @@ forever_patch = Rectangle(xy=(xlimlo, 1),
 ax2.add_patch(forever_patch)
 
 handles, labels = ax2.get_legend_handles_labels()
-# handles = [handles[0]] + list(reversed(handles[1:]))
-# labels = [labels[0]] + list(reversed(labels[1:]))
 handles = list(reversed(handles))
 labels = list(reversed(labels))
 
@@ -150,7 +129,7 @@ for i, event in enumerate(important_dates.keys()):
     labels.append(let.get_label())
 
 legax2 = ax2.legend(handles, labels, loc="lower left",
-                    bbox_to_anchor=bbox_locs[2], ncol=1,
+                    bbox_to_anchor=bbox_locs[2], ncol=2,
                     handler_map={Text: HandlerText()})
 
 for legax2patch in legax2.get_patches():

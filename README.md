@@ -17,6 +17,10 @@ as a function of time.
 Third is an estimate of the probability that at least 1 person in a random
 group of 10 is infected.
 
+Fourth is the fraction of the regional population that is fully
+vaccinated---two shots for either the Pfizer or the Moderna vaccine or one shot
+for the J&J vaccine.
+
 ## Background information on the reproduction number
 
 The reproduction number, R, is the population-wide average number of secondary

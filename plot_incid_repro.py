@@ -47,7 +47,8 @@ important_dates = {
         "VA loosens restrictions": ["2021-03-01"],
         "MD loosens restrictions": ["2021-03-12"],
         "D.C. loosens restrictions": ["2021-03-22"],
-        "Vaccine available to\ngeneral public": ["2021-04-18"]}
+        "Vaccine available to\ngeneral public": ["2021-04-18"],
+        "Mask mandates lifted": ["2021-05-15"]}
 
 rt_offset = timedelta(days=5)
 
@@ -124,7 +125,7 @@ labels = list(reversed(labels))
 for i, event in enumerate(important_dates.keys()):
     ann_letter = string.ascii_uppercase[i]
     date_low = important_dates[event][0]
-    let = ax2.text(x=datestr2num(date_low), y=0.8, s=ann_letter, label=event)
+    let = ax2.text(x=datestr2num(date_low), y=0.6, s=ann_letter, label=event)
     handles.append(let)
     labels.append(let.get_label())
 

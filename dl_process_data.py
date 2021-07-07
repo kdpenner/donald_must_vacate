@@ -77,10 +77,10 @@ df_va_vaccines["dose_number"] = pd.to_numeric(df_va_vaccines["dose_number"])
 df_va_vaccines["vaccine_doses_administered"] = pd.to_numeric(
     df_va_vaccines["vaccine_doses_administered"])
 df_va_vaccines = df_va_vaccines[
-    df_va_vaccines["vaccine_manufacturer"] != "UNSPECIFIED"]
+    df_va_vaccines["vaccine_manufacturer"] != "Non-Specified"]
 df_va_vaccines.loc[
     df_va_vaccines["vaccine_manufacturer"].isin(["Pfizer", "Moderna"]) &
-    df_va_vaccines["dose_number"] == 1, "vaccine_doses_administered"] = 0
+    (df_va_vaccines["dose_number"] == 1), "vaccine_doses_administered"] = 0
 df_va_vaccines.drop("dose_number", axis=1, inplace=True)
 df_va_vaccines.rename({"vaccine_doses_administered": "va_vaccinated"},
                       axis=1, inplace=True)
@@ -116,11 +116,11 @@ df_dc_cases.drop("DATE_REPORTED", axis=1, inplace=True)
 df_dc_cases.rename({"OVERALL_TESTED_TST": "dc_total_tests",
                     "TOTAL_POSITIVES_TST": "dc_total_cases"},
                    axis=1, inplace=True)
-df_dc_cases["dc_new_tests"] = df_dc_cases["dc_total_tests"].diff(1)
-df_dc_cases.drop("dc_total_tests", axis=1, inplace=True)
 df_dc_cases.sort_index(inplace=True)
 df_dc_cases.fillna(method="pad", axis=0, inplace=True)
 df_dc_cases = df_dc_cases.asfreq("1d", method="pad")
+df_dc_cases["dc_new_tests"] = df_dc_cases["dc_total_tests"].diff(1)
+df_dc_cases.drop("dc_total_tests", axis=1, inplace=True)
 
 # D.C. vaccines
 

@@ -80,7 +80,8 @@ df_va_vaccines = df_va_vaccines[
     df_va_vaccines["vaccine_manufacturer"] != "Non-Specified"]
 df_va_vaccines.loc[
     df_va_vaccines["vaccine_manufacturer"].isin(["Pfizer", "Moderna"]) &
-    (df_va_vaccines["dose_number"] == 1), "vaccine_doses_administered"] = 0
+    (df_va_vaccines["dose_number"].isin([1, 3])),
+    "vaccine_doses_administered"] = 0
 df_va_vaccines.drop("dose_number", axis=1, inplace=True)
 df_va_vaccines.rename({"vaccine_doses_administered": "va_vaccinated"},
                       axis=1, inplace=True)

@@ -30,13 +30,13 @@ repro = pd.read_csv("repro_num.csv")
 
 important_dates = {
         "Stay at home orders issued": ["2020-03-30", "2020-04-06"],
-        "Memorial Day;\nphase 1 openings;\nGeorge Floyd protests":
+        "Memorial Day 2020;\nphase 1 openings;\nGeorge Floyd protests":
         ["2020-05-25", "2020-06-06"],
         "Phase 2 openings": ["2020-06-12", "2020-06-22"],
-        "NoVA phase 3 opening;\nIndependence Day":
+        "NoVA phase 3 opening;\nIndependence Day 2020":
         ["2020-07-01", "2020-07-08"],
 #         "John Lewis viewing": ["2020-07-27", "2020-08-03"],
-        "Labor Day": ["2020-09-07", "2020-09-14"],
+        "Labor Day 2020": ["2020-09-07", "2020-09-14"],
 #         "RBG viewing;\nACB Rose Garden event\nTrump's positive test":
 #         ["2020-09-23", "2020-10-02"],
         "Election day;\nBiden celebration;\nMAGA march":
@@ -48,7 +48,10 @@ important_dates = {
         "MD loosens restrictions": ["2021-03-12"],
         "D.C. loosens restrictions": ["2021-03-22"],
         "Vaccine available to\ngeneral public": ["2021-04-18"],
-        "Mask mandates lifted": ["2021-05-15"]}
+        "Mask mandates lifted": ["2021-05-15"],
+        "Memorial Day 2021": ["2021-05-31"],
+        "Independence Day 2021": ["2021-07-04"],
+        "Labor Day 2021": ["2021-09-06"]}
 
 rt_offset = timedelta(days=5)
 
@@ -76,7 +79,7 @@ lightpink = colors[11]
 lightpuke = colors[15]
 lightgray = colors[13]
 
-ax2.set_ylim([0.5, 1.5])
+ax2.set_ylim([0.5, 2.])
 ax2.set_ylabel("Reproduction number")
 
 total_pop = get_pop.dmv_pop()

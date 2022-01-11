@@ -35,23 +35,21 @@ important_dates = {
         "Phase 2 openings": ["2020-06-12", "2020-06-22"],
         "NoVA phase 3 opening;\nIndependence Day 2020":
         ["2020-07-01", "2020-07-08"],
-#         "John Lewis viewing": ["2020-07-27", "2020-08-03"],
         "Labor Day 2020": ["2020-09-07", "2020-09-14"],
-#         "RBG viewing;\nACB Rose Garden event\nTrump's positive test":
-#         ["2020-09-23", "2020-10-02"],
         "Election day;\nBiden celebration;\nMAGA march":
         ["2020-11-03", "2020-11-14"],
-        "Thanksgiving": ["2020-11-26", "2020-12-03"],
-        "Christmas; New Year's": ["2020-12-25", "2020-01-01"],
-        "Invasion by the\nbasket of deplorables": ["2021-01-06"],
-        "VA loosens restrictions": ["2021-03-01"],
-        "MD loosens restrictions": ["2021-03-12"],
-        "D.C. loosens restrictions": ["2021-03-22"],
+        "Thanksgiving 2020": ["2020-11-26", "2020-12-03"],
+        "Christmas 2020; New Year's;\ninvasion by the\nbasket of deplorables":
+        ["2020-12-25", "2020-01-01"],
+        "Restrictions begin\nloosening": ["2021-03-01"],
         "Vaccine available to\ngeneral public": ["2021-04-18"],
-        "Mask mandates lifted": ["2021-05-15"],
+        "VA mask mandate lifted": ["2021-05-15"],
         "Memorial Day 2021": ["2021-05-31"],
         "Independence Day 2021": ["2021-07-04"],
-        "Labor Day 2021": ["2021-09-06"]}
+        "Labor Day 2021": ["2021-09-06"],
+        "Thanksgiving 2021": ["2021-11-25"],
+        "Omicron detected in D.C.": ["2021-12-12"],
+        "Christmas 2021; New Year's": ["2021-12-31"]}
 
 rt_offset = timedelta(days=5)
 
@@ -61,9 +59,6 @@ ax1 = fig.add_subplot(4, 1, 1)
 
 ax1.step(incid["report_date"], incid["dmv_new_cases"], where="pre")
 ax1.set_ylabel("Daily number of\nnew positive cases")
-# legax1 = ax1.legend(loc="lower left", bbox_to_anchor=bbox_locs[1])
-# for legax1patch in legax1.get_patches():
-#     legax1patch.set_alpha(None)
 
 ax2 = fig.add_subplot(4, 1, 2, sharex=ax1)
 ax2.step(incid["report_date"].iloc[10:]-rt_offset, repro["Median(R)"],
@@ -158,8 +153,6 @@ binom_patch6 = Rectangle(xy=(xlimlo, thresh6),
 ax3.add_patch(binom_patch6)
 
 legax3 = ax3.legend(loc="lower left", bbox_to_anchor=bbox_locs[3], ncol=1)
-# legax3patches = legax3.get_patches()
-# legax3patches[0].set_alpha(None)
 
 fig.autofmt_xdate()
 fig.subplots_adjust(hspace=0.05)

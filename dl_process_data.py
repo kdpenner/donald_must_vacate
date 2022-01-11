@@ -82,6 +82,10 @@ df_va_vaccines.loc[
     df_va_vaccines["vaccine_manufacturer"].isin(["Pfizer", "Moderna"]) &
     (df_va_vaccines["dose_number"].isin([1, 3])),
     "vaccine_doses_administered"] = 0
+df_va_vaccines.loc[
+    (df_va_vaccines["vaccine_manufacturer"] == "J&J") &
+    (df_va_vaccines["dose_number"] == 2),
+    "vaccine_doses_administered"] = 0
 df_va_vaccines.drop("dose_number", axis=1, inplace=True)
 df_va_vaccines.rename({"vaccine_doses_administered": "va_vaccinated"},
                       axis=1, inplace=True)
@@ -198,50 +202,6 @@ df_md_json_tests["Date"] = pd.to_datetime(df_md_json_tests["Date"],
 df_md_json_tests = df_md_json_tests.groupby("Date").sum().sum(axis=1)
 df_md_json_tests.rename("md_new_tests", inplace=True)
 
-# MD percent positive and extension of test data
-
-url_md_pos = (md_base + "MDCOVID19_PosPercentByJursidiction/FeatureServer/"
-              "0/query?outFields=ReportDate,Montgomery_Percent_Positive,"
-              "PrinceGeorges_Percent_Positive&where=1=1&f=json&"
-              "returnGeometry=false")
-
-req_md_pos = requests.get(url_md_pos)
-
-json_md_pos = json.loads(req_md_pos.content)
-
-json_md_pos_features = [feature["attributes"]
-                        for feature in json_md_pos["features"]]
-
-df_md_json_pos = pd.DataFrame(json_md_pos_features)
-df_md_json_pos.index = pd.to_datetime(df_md_json_pos["ReportDate"],
-                                      unit="ms").dt.date
-df_md_json_pos.drop("ReportDate", axis=1, inplace=True)
-
-df_md_extend = pd.merge(left=df_md_json_cases, right=df_md_json_pos,
-                        how="left", left_index=True, right_index=True)
-df_md_extend.sort_values("DATE", inplace=True)
-
-moco_new_cases = df_md_extend["Montgomery"].diff(1)
-pgs_new_cases = df_md_extend["Prince_Georges"].diff(1)
-
-moco_new_cases.where(moco_new_cases.isna() | (moco_new_cases > 0.),
-                     other=0., inplace=True)
-pgs_new_cases.where(pgs_new_cases.isna() | (pgs_new_cases > 0.),
-                    other=0., inplace=True)
-
-moco_extend = moco_new_cases                                         \
-              / (df_md_extend["Montgomery_Percent_Positive"] / 100.)
-pgs_extend = pgs_new_cases                                             \
-             / (df_md_extend["PrinceGeorges_Percent_Positive"] / 100.)
-
-md_extend = moco_extend + pgs_extend
-
-df_md_extend["md_new_tests_extend"] = md_extend
-
-df_md_extend.drop(["Montgomery", "Prince_Georges",
-                   "Montgomery_Percent_Positive",
-                   "PrinceGeorges_Percent_Positive"], axis=1, inplace=True)
-
 # MD vaccines
 
 url_md_vaccines = (md_base + "MD_COVID19_TotalVaccinationsCounty"
@@ -268,7 +228,7 @@ df_md_json_vaccines.rename("md_vaccinated", inplace=True)
 
 df_md = reduce(lambda left, right: pd.merge(left=left, right=right,
                how="outer", left_index=True, right_index=True),
-               [df_md_extend, df_md_json_tests, df_md_json_vaccines])
+               [df_md_json_cases, df_md_json_tests, df_md_json_vaccines])
 
 # if df_md["md_total_cases"].isna().any():
 #     print("MD missing day, find out what to do")
@@ -285,7 +245,7 @@ df.sort_index(inplace=True)
 # Cases
 
 mask_total_cases = df.columns.str.contains("_total_cases")
-df["dmv_total_cases"] = df.loc[:, mask_total_cases].sum(axis=1)
+df["dmv_total_cases"] = df.loc[:, mask_total_cases].sum(axis=1, min_count=3)
 
 df["dmv_new_cases"] = df["dmv_total_cases"].diff(1)
 df["va_new_cases"] = df["va_total_cases"].diff(1)
